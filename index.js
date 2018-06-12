@@ -66,7 +66,7 @@ const libcrt = ffi.Library(path.join(__dirname, './lib/CRT_580'), {
   CommClose: [ 'int', [ 'pointer' ]],
   CRT580_Reset: [ 'int', [ 'pointer', 'int', 'int' ]], // AddrH, Addrl
   CRT580_CardSetting: [ 'int', [ 'pointer', 'int', 'int', 'int', 'int' ]],
-  CRT580_GetStatus: [ 'int', [ 'pointer', 'int', 'int', 'pointer', 'pointer', 'pointer', 'pointer', 'pointer', 'pointer' ]],
+  CRT580_Geterror: [ 'int', [ 'pointer', 'int', 'int', 'pointer', 'pointer', 'pointer', 'pointer', 'pointer', 'pointer' ]],
   CRT580_MoveCard: [ 'int', [ 'pointer', 'int', 'int', 'int', 'int' ]],
   MC_ReadTrack: [ 'int', [ 'pointer', 'int', 'int', 'int', 'int', 'pointer', 'pointer' ]],
   CRT_IC_CardOpen: [ 'int', [ 'pointer', 'int', 'int' ]],
@@ -80,11 +80,11 @@ hardware.CommOpen = port => {
   try {
     const handle = libcrt.CommOpen(port);
     if (ref.isNull(handle)) {
-      return { status: -1 };
+      return { error: -1 };
     }
-    return { status: 0, data: { handle } };
+    return { error: 0, data: { handle } };
   } catch (e) {
-    return { status: -1 };
+    return { error: -1 };
   }
 };
 
@@ -92,11 +92,11 @@ hardware.CommClose = handle => {
   try {
     const res = libcrt.CommClose(handle);
     if (res === 0) {
-      return { status: 0 };
+      return { error: 0 };
     }
-    return { status: -1 };
+    return { error: -1 };
   } catch (e) {
-    return { status: -1 };
+    return { error: -1 };
   }
 };
 
@@ -104,11 +104,11 @@ hardware.CRT580_Reset = (handle, deviceSerial) => {
   try {
     const res = libcrt.CRT580_Reset(handle, 0x30, deviceSerial);
     if (res === 0) {
-      return { status: 0 };
+      return { error: 0 };
     }
-    return { status: -1 };
+    return { error: -1 };
   } catch (e) {
-    return { status: -1 };
+    return { error: -1 };
   }
 };
 
@@ -116,11 +116,11 @@ hardware.CRT580_CardSetting = (handle, deviceSerial, cardIn, stopPosition) => {
   try {
     const res = libcrt.CRT580_CardSetting(handle, 0x30, deviceSerial, cardIn, stopPosition);
     if (res === 0) {
-      return { status: 0 };
+      return { error: 0 };
     }
-    return { status: -1 };
+    return { error: -1 };
   } catch (e) {
-    return { status: -1 };
+    return { error: -1 };
   }
 };
 
@@ -135,13 +135,13 @@ hardware.CRT580_GetStatus = (handle, deviceSerial) => {
     const ss0 = ref.alloc(ref.types.byte);
     const res = libcrt.CRT580_GetStatus(handle, deviceSerial[0], deviceSerial[1], ss5, ss4, ss3, ss2, ss1, ss0);
     if (res === 0) {
-      return { status: 0, data: { ss5: ss5.deref(), ss4: ss4.deref(), ss3: ss3.deref(),
+      return { error: 0, data: { ss5: ss5.deref(), ss4: ss4.deref(), ss3: ss3.deref(),
         ss2: ss2.deref(), ss1: ss1.deref(), ss0: ss0.deref() },
       };
     }
-    return { status: -1 };
+    return { error: -1 };
   } catch (e) {
-    return { status: -1 };
+    return { error: -1 };
   }
 };
 
@@ -149,11 +149,11 @@ hardware.CRT580_MoveCard = (handle, deviceSerial, toPosition, fromPosition) => {
   try {
     const res = libcrt.CRT580_MoveCard(handle, 0x30, deviceSerial, toPosition, fromPosition);
     if (res === 0) {
-      return { status: 0 };
+      return { error: 0 };
     }
-    return { status: -1 };
+    return { error: -1 };
   } catch (e) {
-    return { status: -1 };
+    return { error: -1 };
   }
 };
 
@@ -177,11 +177,11 @@ hardware.MC_ReadTrack = (handle, deviceSerial, track) => {
       if (blocks[2]) {
         track3 = (blocks[2][0] === 0x59) ? blocks[2].slice(1).toString() : undefined;
       }
-      return { status: 0, data: { track1, track2, track3 } };
+      return { error: 0, data: { track1, track2, track3 } };
     }
-    return { status: -1 };
+    return { error: -1 };
   } catch (e) {
-    return { status: -1 };
+    return { error: -1 };
   }
 };
 
@@ -190,11 +190,11 @@ hardware.CRT_IC_CardOpen = (handle, deviceSerial) => {
   try {
     const res = libcrt.CRT_IC_CardOpen(handle, 0x30, deviceSerial);
     if (res === 0) {
-      return { status: 0 };
+      return { error: 0 };
     }
-    return { status: -1 };
+    return { error: -1 };
   } catch (e) {
-    return { status: -1 };
+    return { error: -1 };
   }
 };
 
@@ -202,11 +202,11 @@ hardware.CRT_IC_CardClose = (handle, deviceSerial) => {
   try {
     const res = libcrt.CRT_IC_CardClose(handle, 0x30, deviceSerial);
     if (res === 0) {
-      return { status: 0 };
+      return { error: 0 };
     }
-    return { status: -1 };
+    return { error: -1 };
   } catch (e) {
-    return { status: -1 };
+    return { error: -1 };
   }
 };
 
@@ -217,12 +217,12 @@ hardware.CPU_Reset = (handle, deviceSerial) => {
     const data = ref.alloc(ref.types.char);
     const res = libcrt.CPU_Reset(handle, 0x30, deviceSerial, cpuType, data, len);
     if (res === 0) {
-      return { status: 0, data: { cpuType: cpuType.deref(), exData: ref.reinterpret(data, len.deref()).toString() } };
+      return { error: 0, data: { cpuType: cpuType.deref(), exData: ref.reinterpret(data, len.deref()).toString() } };
     }
     console.log(res);
-    return { status: -1 };
+    return { error: -1 };
   } catch (e) {
-    return { status: -1 };
+    return { error: -1 };
   }
 };
 
@@ -234,11 +234,11 @@ hardware.CPU_T0_C_APDU = (handle, deviceSerial, apduData) => {
     const res = libcrt.CPU_T0_C_APDU(handle, 0x30, deviceSerial, inData.length, inData, data, len);
     const outData = ref.reinterpret(data, len.deref());
     if (res === 0) {
-      return { status: 0, data: { exData: hex2Str(outData) } };
+      return { error: 0, data: { exData: hex2Str(outData) } };
     }
-    return { status: -1 };
+    return { error: -1 };
   } catch (e) {
-    return { status: -1 };
+    return { error: -1 };
   }
 };
 
@@ -250,11 +250,11 @@ hardware.CPU_T1_C_APDU = (handle, deviceSerial, apduData) => {
     const res = libcrt.CPU_T1_C_APDU(handle, 0x30, deviceSerial, inData.length, inData, data, len);
     const outData = ref.reinterpret(data, len.deref());
     if (res === 0) {
-      return { status: 0, data: { exData: hex2Str(outData) } };
+      return { error: 0, data: { exData: hex2Str(outData) } };
     }
-    return { status: -1 };
+    return { error: -1 };
   } catch (e) {
-    return { status: -1 };
+    return { error: -1 };
   }
 };
 

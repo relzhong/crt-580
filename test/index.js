@@ -5,15 +5,15 @@ const crt = require('../index');
 describe('test com port connect', () => {
   let device;
   it('should open COM3 successfully', () => {
-    const { status, data } = crt.CommOpen('COM3');
-    assert(status === 0);
+    const { error, data } = crt.CommOpen('COM3');
+    assert(error === 0);
     device = data.handle;
   });
-  it('should get status successfully', () => {
+  it('should get error successfully', () => {
     let res = crt.CRT580_Reset(device, 0x30);
-    assert(res.status === 0);
+    assert(res.error === 0);
     res = crt.CRT580_CardSetting(device, 0x30, 0x31, 0x32);
-    assert(res.status === 0);
+    assert(res.error === 0);
   });
   after(() => {
     crt.CommClose(device);
@@ -23,13 +23,13 @@ describe('test com port connect', () => {
 describe('send card to track read', () => {
   let device;
   it('should open COM3 successfully', () => {
-    const { status, data } = crt.CommOpen('COM3');
-    assert(status === 0);
+    const { error, data } = crt.CommOpen('COM3');
+    assert(error === 0);
     device = data.handle;
   });
   it('should send card position to ic positon', () => {
     const res = crt.CRT580_MoveCard(device, 0x30, 0x32, 0x30);
-    assert(res.status === 0);
+    assert(res.error === 0);
   });
   after(() => {
     crt.CommClose(device);
@@ -39,13 +39,13 @@ describe('send card to track read', () => {
 describe('test mc track read', () => {
   let device;
   it('should open COM3 successfully', () => {
-    const { status, data } = crt.CommOpen('COM3');
-    assert(status === 0);
+    const { error, data } = crt.CommOpen('COM3');
+    assert(error === 0);
     device = data.handle;
   });
   it('should read track successfully', () => {
     const res = crt.MC_ReadTrack(device, 0x30, 0x37);
-    assert(res.status === 0);
+    assert(res.error === 0);
   });
   it('should read track2 successfully', () => {
     const res = crt.MC_ReadTrack(device, 0x30, 0x37);
@@ -59,25 +59,25 @@ describe('test mc track read', () => {
 describe('test ic card read', () => {
   let device;
   it('should open COM3 successfully', () => {
-    const { status, data } = crt.CommOpen('COM3');
-    assert(status === 0);
+    const { error, data } = crt.CommOpen('COM3');
+    assert(error === 0);
     device = data.handle;
   });
   it('should send card position to ic positon', () => {
     const res = crt.CRT580_MoveCard(device, 0x30, 0x32, 0x31);
-    assert(res.status === 0);
+    assert(res.error === 0);
   });
   it('should open ic card', () => {
     const res = crt.CRT_IC_CardOpen(device, 0x30);
-    assert(res.status === 0);
+    assert(res.error === 0);
   });
   it('should reset ic card', () => {
     const res = crt.CPU_Reset(device, 0x30);
-    assert(res.status === 0);
+    assert(res.error === 0);
   });
   it('should exec apdu in type 0 card', () => {
     const res = crt.CPU_T0_C_APDU(device, 0x30, '00A404000E315041592E5359532E4444463031');
-    assert(res.status === 0);
+    assert(res.error === 0);
   });
   it('should exec apdu successfully', () => {
     const res = crt.CPU_T0_C_APDU(device, 0x30, '00A404000E315041592E5359532E4444463031');
@@ -91,13 +91,13 @@ describe('test ic card read', () => {
 describe('send card to receiver', () => {
   let device;
   it('should open COM3 successfully', () => {
-    const { status, data } = crt.CommOpen('COM3');
-    assert(status === 0);
+    const { error, data } = crt.CommOpen('COM3');
+    assert(error === 0);
     device = data.handle;
   });
   it('should send card position to receiver', () => {
     const res = crt.CRT580_MoveCard(device, 0x30, 0x35, 0x31);
-    assert(res.status === 0);
+    assert(res.error === 0);
   });
   after(() => {
     crt.CommClose(device);
