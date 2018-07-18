@@ -66,6 +66,7 @@ const libcrt = ffi.Library(path.join(__dirname, './lib/CRT_580'), {
   CommClose: [ 'int', [ 'pointer' ]],
   CRT580_Reset: [ 'int', [ 'pointer', 'int', 'int' ]], // AddrH, Addrl
   CRT580_CardSetting: [ 'int', [ 'pointer', 'int', 'int', 'int', 'int' ]],
+  CRT580_GetStatus: [ 'int', [ 'pointer', 'int', 'int', 'pointer', 'pointer', 'pointer', 'pointer', 'pointer', 'pointer' ]],
   CRT580_MoveCard: [ 'int', [ 'pointer', 'int', 'int', 'int', 'int' ]],
   MC_ReadTrack: [ 'int', [ 'pointer', 'int', 'int', 'int', 'int', 'pointer', 'pointer' ]],
   CRT_IC_CardOpen: [ 'int', [ 'pointer', 'int', 'int' ]],
@@ -132,7 +133,7 @@ hardware.CRT580_GetStatus = (handle, deviceSerial) => {
     const ss2 = ref.alloc(ref.types.byte);
     const ss1 = ref.alloc(ref.types.byte);
     const ss0 = ref.alloc(ref.types.byte);
-    const res = libcrt.CRT580_GetStatus(handle, deviceSerial[0], deviceSerial[1], ss5, ss4, ss3, ss2, ss1, ss0);
+    const res = libcrt.CRT580_GetStatus(handle, 0x30, deviceSerial, ss5, ss4, ss3, ss2, ss1, ss0);
     if (res === 0) {
       return { error: 0, data: { ss5: ss5.deref(), ss4: ss4.deref(), ss3: ss3.deref(),
         ss2: ss2.deref(), ss1: ss1.deref(), ss0: ss0.deref() },
