@@ -66,7 +66,6 @@ const libcrt = ffi.Library(path.join(__dirname, './lib/CRT_580'), {
   CommClose: [ 'int', [ 'pointer' ]],
   CRT580_Reset: [ 'int', [ 'pointer', 'int', 'int' ]], // AddrH, Addrl
   CRT580_CardSetting: [ 'int', [ 'pointer', 'int', 'int', 'int', 'int' ]],
-  CRT580_Geterror: [ 'int', [ 'pointer', 'int', 'int', 'pointer', 'pointer', 'pointer', 'pointer', 'pointer', 'pointer' ]],
   CRT580_MoveCard: [ 'int', [ 'pointer', 'int', 'int', 'int', 'int' ]],
   MC_ReadTrack: [ 'int', [ 'pointer', 'int', 'int', 'int', 'int', 'pointer', 'pointer' ]],
   CRT_IC_CardOpen: [ 'int', [ 'pointer', 'int', 'int' ]],
