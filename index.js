@@ -5,6 +5,34 @@ const bsplit = require('buffer-split');
 const R = require('ramda');
 const Decimal = require('decimal.js');
 const hardware = {};
+const stack = require('callsite');
+
+function hazardous(location) {
+  const electronRegex = /[\\/]electron\.asar[\\/]/;
+  const asarRegex = /^(?:^\\\\\?\\)?(.*\.asar)[\\/](.*)/;
+  /* convert path when use electron asar unpack
+   */
+  if (!path.isAbsolute(location)) {
+    return location;
+  }
+
+  if (electronRegex.test(location)) {
+    return location;
+  }
+
+  const matches = asarRegex.exec(location);
+  if (!matches || matches.length !== 3) {
+    return location;
+  }
+
+  /* Skip monkey patching when an electron method is in the callstack. */
+  const skip = stack().some(site => {
+    const siteFile = site.getFileName();
+    return /^ELECTRON_ASAR/.test(siteFile) || electronRegex.test(siteFile);
+  });
+
+  return skip ? location : location.replace(/\.asar([\\/])/, '.asar.unpacked$1');
+}
 
 /**
    * 字符串转Hex Buffer
@@ -61,7 +89,7 @@ function hex2Str(req) {
   return dec;
 }
 
-const libcrt = ffi.Library(path.join(__dirname, './lib/CRT_580'), {
+const libcrt = ffi.Library(hazardous(path.join(__dirname, './lib/CRT_580')), {
   CommOpen: [ 'pointer', [ 'string' ]],
   CommClose: [ 'int', [ 'pointer' ]],
   CRT580_Reset: [ 'int', [ 'pointer', 'int', 'int' ]], // AddrH, Addrl
